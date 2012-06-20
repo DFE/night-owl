@@ -61,4 +61,4 @@ Examples:
     $ bitbake MLO | ./log_errors.py testBuild 3 >>error.log
     $ cat error.log | ./error_to_json.py | grep count | ./graph.py build-error Errors_Graph Build Count
 
-![build-error.png](test/build-error.png)
+![build-error.png](data/build-error.png)
