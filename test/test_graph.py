@@ -13,19 +13,20 @@
 # 2 of the License, or (at your option) any later version.
 #
 
+import unittest
 import sys
 import os
-import unittest
+import inspect
+#enable importing from one path up
+sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))+'/..')
+
 import numpy as np
 import matplotlib.pyplot as plt
-
-#enable importing from one path up
-sys.path.append(os.getcwd()+'/..')
 
 from graph import make_msgline,append_msgline
 from constants import *
 
-class TestFilterErrorlog(unittest.TestCase):
+class TestGraph(unittest.TestCase):
 
     def test_makeMessageline_empty_tuple(self):
         #init
@@ -64,6 +65,8 @@ class TestFilterErrorlog(unittest.TestCase):
         self.assertEqual(out[0].size,1)
         self.assertEqual(out[1].size,1)
 
+        def suite():
+            suite = unittest.TestLoader().loadTestsFromTestCase(TestGraph)
 
 if __name__ == "__main__":
 	unittest.main()

@@ -25,7 +25,7 @@ def parse_line(line):
     :return: a touple of (output-txt, token_type)
     """
     out = ""
-    token_type = TYPE_START
+    token_type = TASK_START
     if line.startswith("NOTE: package"):
         task_name = re.sub(r'NOTE: package (.*)',r'\1',line,re.I)
         task_name = re.sub(r'(: Started\s*)|(: Succeeded\s*)|(: Failed\s*)',

@@ -17,9 +17,11 @@ from __future__ import print_function
 import unittest
 import sys
 import os
-import json
+import inspect
 #enable importing from one path up
-sys.path.append(os.getcwd()+'/..')
+sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))+'/..')
+
+import json
 
 from to_json import make_notification, make_count, parse_line,parse_errorlog
 from constants import *
@@ -204,6 +206,9 @@ class TestToJson(unittest.TestCase):
         #eval
         self.assertEqual(printed,output_expect,
                 "'{0}'!='{1}'".format(printed,output_expect))
+
+        def suite():
+            suite = unittest.TestLoader().loadTestsFromTestCase(TestToJson)
 
 if __name__ == "__main__":
     unittest.main()

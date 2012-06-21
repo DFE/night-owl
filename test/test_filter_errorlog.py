@@ -13,12 +13,12 @@
 # 2 of the License, or (at your option) any later version.
 #
 
+import unittest
 import sys
 import os
-import unittest
-
+import inspect
 #enable importing from one path up
-sys.path.append(os.getcwd()+'/..')
+sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))+'/..')
 
 from filter_errorlog import parse_line, parse_build
 from constants import *
@@ -187,7 +187,7 @@ Error count: 1
                 "'{0}'!='{1}'".format(out,out_expect))
 
     def test_parseBuild_packageErrorPackage_stillTwolines(self):
-        #init
+            #init
         job = "Testjob"
         build = 123
         instream = ['NOTE: package Testpackage: Started','error: abc def','NOTE: package Invisible: Started']
@@ -213,14 +213,14 @@ Error count: 1
         job = "Testjob"
         build = 123
         instream = [
-            'NOTE: package Testpackage: Started',
-            'error: abc def',
-            'NOTE: package Testpackage2: Started',
-            'warNING: def ghi',
-            'ERRoR: qwer ty',
-            'ERROr: qwer tz',
-            'NOTE: package Invisible: Started'
-        ]
+                'NOTE: package Testpackage: Started',
+                'error: abc def',
+                'NOTE: package Testpackage2: Started',
+                'warNING: def ghi',
+                'ERRoR: qwer ty',
+                'ERROr: qwer tz',
+                'NOTE: package Invisible: Started'
+                ]
         start_state = None
         out_expect = """\
 ----------[START:{0}({1})]----------
@@ -242,6 +242,9 @@ Error count: 3
         #eval
         self.assertEqual(out,out_expect,
                 "'{0}'!='{1}'".format(out,out_expect))
+
+    def suite():
+        suite = unittest.TestLoader().loadTestsFromTestCase(TestFilterErrorlog)
 
 if __name__ == "__main__":
     unittest.main()
