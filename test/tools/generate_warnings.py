@@ -35,7 +35,7 @@ def generate_problem_line(txt=None,choices=None):
     :param txt: the fill text, where the error/warning should be inserted
     :param choice: a list of things that could be inserted
     """
-    if not txt: txt = fill_text
+    if not txt: txt = fill_txt
     if not choices: choices = problem_choices
     out = random.choice(choices)+txt
     return out
@@ -74,7 +74,7 @@ def main():
     normal_times = normal_times if normal_times > 0 else 0
     lines = [txt for i in range(normal_times)] + \
             [package_txt.format(i+1) for i in range(new_tasks)]+\
-            [generate_warn_line() for i in range(warn_times)]
+            [generate_problem_line() for i in range(warn_times)]
     random.shuffle(lines)
     lines = [package_txt.format(0)]+lines
     print '\n'.join(lines)

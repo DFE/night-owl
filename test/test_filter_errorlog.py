@@ -87,18 +87,24 @@ class TestFilterErrorlog(unittest.TestCase):
         build = 123
         instream = []
         start_state = None
-        out_expect = """\
-----------[START:{0}({1})]----------
-
-
-Warning count: 0
-Error count: 0
-----------[END:{0}({1})]----------""".format(job,build)
+        warn_expect = 0
+        err_expect = 0
+        print_expect = [
+            "----------[START:{0}({1})]----------".format(job,build),
+            "",
+            "",
+            "Warning count: {0}".format(warn_expect),
+            "Error count: {0}".format(err_expect),
+            "",
+            "----------[END:{0}({1})]----------""".format(job,build)
+        ]
+        printed = []
+        mock = lambda *args, **kwargs: printed.append(args[0] if len(args)>0 else "")
         #exec
-        out = parse_build(job,build,instream,start_state)
+        parse_build(job,build,instream,start_state,mprint=mock)
         #eval
-        self.assertEqual(out,out_expect,
-                "'{0}'!='{1}'".format(out,out_expect))
+        self.assertEqual(printed,print_expect,
+                "'{0}'!='{1}'".format(printed,print_expect))
 
     def test_parseBuild_warning_showWarnline(self):
         #init
@@ -106,22 +112,27 @@ Error count: 0
         build = 123
         instream = ['warning: abc def']
         start_state = None
-        out_expect = """\
-----------[START:{0}({1})]----------
-
-[ONSTART]
-WARNING: abc def
-
-
-Warning count: 1
-Error count: 0
-----------[END:{0}({1})]----------""".format(job,build)
+        warn_expect = 1
+        err_expect = 0
+        print_expect = [
+            "----------[START:{0}({1})]----------".format(job,build),
+            "",
+            "[{0}]".format(TASK_START),
+            "WARNING: abc def",
+            "",
+            "",
+            "Warning count: {0}".format(warn_expect),
+            "Error count: {0}".format(err_expect),
+            "",
+            "----------[END:{0}({1})]----------""".format(job,build)
+        ]
+        printed = []
+        mock = lambda *args, **kwargs: printed.append(args[0] if len(args)>0 else "")
         #exec
-        out = parse_build(job,build,instream,start_state)
+        parse_build(job,build,instream,start_state,mprint=mock)
         #eval
-        self.assertEqual(out,out_expect,
-                "'{0}'!='{1}'".format(out,out_expect))
-
+        self.assertEqual(printed,print_expect,
+                "'{0}'!='{1}'".format(printed,print_expect))
 
     def test_parsebuild_error_showErrorline(self):
         #init
@@ -129,21 +140,27 @@ Error count: 0
         build = 123
         instream = ['error: abc def']
         start_state = None
-        out_expect = """\
-----------[START:{0}({1})]----------
-
-[ONSTART]
-ERROR: abc def
-
-
-Warning count: 0
-Error count: 1
-----------[END:{0}({1})]----------""".format(job,build)
+        warn_expect = 0
+        err_expect = 1
+        print_expect = [
+            "----------[START:{0}({1})]----------".format(job,build),
+            "",
+            "[{0}]".format(TASK_START),
+            "ERROR: abc def",
+            "",
+            "",
+            "Warning count: {0}".format(warn_expect),
+            "Error count: {0}".format(err_expect),
+            "",
+            "----------[END:{0}({1})]----------""".format(job,build)
+        ]
+        printed = []
+        mock = lambda *args, **kwargs: printed.append(args[0] if len(args)>0 else "")
         #exec
-        out = parse_build(job,build,instream,start_state)
+        parse_build(job,build,instream,start_state,mprint=mock)
         #eval
-        self.assertEqual(out,out_expect,
-                "'{0}'!='{1}'".format(out,out_expect))
+        self.assertEqual(printed,print_expect,
+                "'{0}'!='{1}'".format(printed,print_expect))
 
     def test_parseBuild_package_stillEmpty(self):
         #init
@@ -151,40 +168,24 @@ Error count: 1
         build = 123
         instream = ['NOTE: package Testpackage: Started']
         start_state = None
-        out_expect = """\
-----------[START:{0}({1})]----------
-
-
-Warning count: 0
-Error count: 0
-----------[END:{0}({1})]----------""".format(job,build)
+        warn_expect = 0
+        err_expect = 0
+        print_expect = [
+            "----------[START:{0}({1})]----------".format(job,build),
+            "",
+            "",
+            "Warning count: {0}".format(warn_expect),
+            "Error count: {0}".format(err_expect),
+            "",
+            "----------[END:{0}({1})]----------""".format(job,build)
+        ]
+        printed = []
+        mock = lambda *args, **kwargs: printed.append(args[0] if len(args)>0 else "")
         #exec
-        out = parse_build(job,build,instream,start_state)
+        parse_build(job,build,instream,start_state,mprint=mock)
         #eval
-        self.assertEqual(out,out_expect,
-                "'{0}'!='{1}'".format(out,out_expect))
-
-    def test_parseBuild_packageError_showBothlines(self):
-        #init
-        job = "Testjob"
-        build = 123
-        instream = ['NOTE: package Testpackage: Started','error: abc def']
-        start_state = None
-        out_expect = """\
-----------[START:{0}({1})]----------
-
-[Testpackage]
-ERROR: abc def
-
-
-Warning count: 0
-Error count: 1
-----------[END:{0}({1})]----------""".format(job,build)
-        #exec
-        out = parse_build(job,build,instream,start_state)
-        #eval
-        self.assertEqual(out,out_expect,
-                "'{0}'!='{1}'".format(out,out_expect))
+        self.assertEqual(printed,print_expect,
+                "'{0}'!='{1}'".format(printed,print_expect))
 
     def test_parseBuild_packageErrorPackage_stillTwolines(self):
             #init
@@ -192,21 +193,27 @@ Error count: 1
         build = 123
         instream = ['NOTE: package Testpackage: Started','error: abc def','NOTE: package Invisible: Started']
         start_state = None
-        out_expect = """\
-----------[START:{0}({1})]----------
-
-[Testpackage]
-ERROR: abc def
-
-
-Warning count: 0
-Error count: 1
-----------[END:{0}({1})]----------""".format(job,build)
+        warn_expect = 0
+        err_expect = 1
+        print_expect = [
+            "----------[START:{0}({1})]----------".format(job,build),
+            "",
+            "[{0}]".format("Testpackage"),
+            "ERROR: abc def",
+            "",
+            "",
+            "Warning count: {0}".format(warn_expect),
+            "Error count: {0}".format(err_expect),
+            "",
+            "----------[END:{0}({1})]----------""".format(job,build)
+        ]
+        printed = []
+        mock = lambda *args, **kwargs: printed.append(args[0] if len(args)>0 else "")
         #exec
-        out = parse_build(job,build,instream,start_state)
+        parse_build(job,build,instream,start_state,mprint=mock)
         #eval
-        self.assertEqual(out,out_expect,
-                "'{0}'!='{1}'".format(out,out_expect))
+        self.assertEqual(printed,print_expect,
+                "'{0}'!='{1}'".format(printed,print_expect))
 
     def test_parseBuild_complex_complex(self):
         #init
@@ -222,26 +229,32 @@ Error count: 1
                 'NOTE: package Invisible: Started'
                 ]
         start_state = None
-        out_expect = """\
-----------[START:{0}({1})]----------
-
-[Testpackage]
-ERROR: abc def
-
-[Testpackage2]
-WARNING: def ghi
-ERROR: qwer ty
-ERROR: qwer tz
-
-
-Warning count: 1
-Error count: 3
-----------[END:{0}({1})]----------""".format(job,build)
+        warn_expect = 1
+        err_expect = 3
+        print_expect = [
+            "----------[START:{0}({1})]----------".format(job,build),
+            "",
+            "[{0}]".format("Testpackage"),
+            "ERROR: abc def",
+            "",
+            "[{0}]".format("Testpackage2"),
+            "WARNING: def ghi",
+            "ERROR: qwer ty",
+            "ERROR: qwer tz",
+            "",
+            "",
+            "Warning count: {0}".format(warn_expect),
+            "Error count: {0}".format(err_expect),
+            "",
+            "----------[END:{0}({1})]----------""".format(job,build)
+        ]
+        printed = []
+        mock = lambda *args, **kwargs: printed.append(args[0] if len(args)>0 else "")
         #exec
-        out = parse_build(job,build,instream,start_state)
+        parse_build(job,build,instream,start_state,mprint=mock)
         #eval
-        self.assertEqual(out,out_expect,
-                "'{0}'!='{1}'".format(out,out_expect))
+        self.assertEqual(printed,print_expect,
+                "'{0}'!='{1}'".format(printed,print_expect))
 
     def suite():
         suite = unittest.TestLoader().loadTestsFromTestCase(TestFilterErrorlog)

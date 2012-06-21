@@ -12,6 +12,7 @@
 # as published by the Free Software Foundation; either version
 # 2 of the License, or (at your option) any later version.
 #
+from __future__ import print_function
 
 import sys
 import re
@@ -44,11 +45,11 @@ def parse_line(line):
     return (out,token_type)
 
 
-def parse_build(job,build,instream,start_state=None):
+def parse_build(job,build,instream,start_state=None,mprint=print):
     if not start_state: start_state = START_STATE_ERRORLOGGER
     task,task_printed,warning_count, error_count = start_state
 
-    out = "----------[START:{0}({1})]----------\n".format(job,build)
+    mprint("----------[START:{0}({1})]----------".format(job,build))
     for line in instream:
         token = parse_line(line)
         txt = token[0]
@@ -62,13 +63,16 @@ def parse_build(job,build,instream,start_state=None):
         else:
             if not task_printed:
                 task_printed = True
-                out += "\n"+task+"\n"
-            out += txt+"\n"
+                mprint()
+                mprint(task)
+            mprint(txt)
 
-    out += "\n\nWarning count: {0}\n".format(warning_count)
-    out += "Error count: {0}\n".format(error_count)
-    out += "----------[END:{0}({1})]----------".format(job,build)
-    return out
+    mprint()
+    mprint()
+    mprint("Warning count: {0}".format(warning_count))
+    mprint("Error count: {0}".format(error_count))
+    mprint()
+    mprint("----------[END:{0}({1})]----------".format(job,build))
 
 def main():
     parser = argparse.ArgumentParser(description="creates error-logs \
@@ -80,7 +84,7 @@ def main():
     args = parser.parse_args()
 
 
-    print parse_build(args.job,args.build,sys.stdin)
+    parse_build(args.job,args.build,sys.stdin)
 
 
 
