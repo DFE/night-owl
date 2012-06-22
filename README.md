@@ -1,8 +1,8 @@
-OEUC error-log
+OpenEmbedded Under Control
 ==============
 
-OEUC error-log is the power tool for managing errors and warnings in your
-OpenEmbedded project. As first part of the OpemEmbeddedUnderControl (OEUC)
+`opencontrol error-log` is the power tool for managing errors and warnings in
+your OpenEmbedded project. As first part of the `OpenEmbedded Under Control`
 platform it helps you in automating your product development process and
 gives you a fast and precise overview about the problems your project might
 have.
@@ -23,6 +23,8 @@ Examples:
 
   1. get errorlogs from your bitbake logs
 
+Code:
+
     $ bitbake myMLO | ./log_errors.py testBuild 1 >error.log
     $ cat error.log
     -------[START:testBuild(1)]-------
@@ -41,6 +43,8 @@ Examples:
 
   2. get the same output as json (e.g. to drop it into a database)
 
+Code:
+
     $ bitbake MLO | ./log_errors.py testBuild 2 >>error.log
     $ cat error.log | ./error_to_json.py
     {"build": "1", "job": "myMLO", "message": "blabla", "task": "abc-1.1.1-r123: task do_fetch", "type": "WARNING"}
@@ -57,6 +61,8 @@ Examples:
     {"build": "2", "count": "2", "job": "myMLO", "type": "ERROR"}
 
   3. graph the errors/warnings over builds
+
+Code:
 
     $ bitbake MLO | ./log_errors.py testBuild 3 >>error.log
     $ cat error.log | ./error_to_json.py | grep count | ./graph.py build-error Errors_Graph Build Count
