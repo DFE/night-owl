@@ -1,23 +1,22 @@
 OpenEmbedded Under Control
 ==============
 
-`opencontrol error-log` is the power tool for managing errors and warnings in
-your OpenEmbedded project. As first part of the `OpenEmbedded Under Control`
-platform it helps you in automating your product development process and
-gives you a fast and precise overview about the problems your project might
-have.
+`OpenEmbedded Under Control` is a early alpha platform for automating your
+product development process and recieving fast and precise feedback about the
+problems your OpenEmbedded project might have.
 
 Installation
 ------------
 
-To get started you need: Python2.7, matplotlib and `/bin/sh`.
+To get started you need: Linux, Python2.7, matplotlib and `/bin/sh`.
 
 
 Getting Started
 ---------------
 
 If all requirements are fullfilled you can get started. There is a tutorial
-planned for the future. For now you have to use the source code documentation.
+planned for the future. For now you have to use the source code documentation
+if you have questions.
 
 Examples:
 
