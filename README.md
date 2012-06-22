@@ -5,6 +5,14 @@ OpenEmbedded Under Control
 product development process and recieving fast and precise feedback about the
 problems your OpenEmbedded project might have.
 
+At the moment it allows you to filter your warnings and errors from your
+`bitbake` outputs (or logs) and generate a graph over Error- and Warning-
+development over the last builds.
+
+Further development is planned, of course, in form of a Master's thesis.
+Finally `opencontrol` should be as powerful in managing your project dev as
+[phpUnderControl|phpundercontrol/phpUnderControl].
+
 Installation
 ------------
 

@@ -5,7 +5,7 @@
 # OEUC error-log - a framework for logging and presentation of errors and warnings
 #
 # Copyright (C) 2012 DResearch Fahrzeugelektronik GmbH
-# Written and maintained by Thilo Fromm <fromm@dresearch-fe.de>
+# Written and maintained by Erik Bernoth <bernoth@dresearch-fe.de>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
