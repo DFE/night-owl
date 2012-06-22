@@ -13,20 +13,20 @@
 # 2 of the License, or (at your option) any later version.
 #
 
-./generate_warnings.py 130 200 | ./log_errors.py testA 0 
-./generate_warnings.py 120 200 | ./log_errors.py testA 1 
-./generate_warnings.py 110 200 | ./log_errors.py testA 2 
-./generate_warnings.py 100 200 | ./log_errors.py testA 3 
-./generate_warnings.py 100 200 | ./log_errors.py testA 4 
+test/tools/generate_warnings.py 130 200 | ./filter_errorlog.py testA 1 
+test/tools/generate_warnings.py 120 200 | ./filter_errorlog.py testA 2 
+test/tools/generate_warnings.py 110 200 | ./filter_errorlog.py testA 3 
+test/tools/generate_warnings.py 100 200 | ./filter_errorlog.py testA 4 
+test/tools/generate_warnings.py 100 200 | ./filter_errorlog.py testA 5 
 
-./generate_warnings.py 190 200 | ./log_errors.py testB 0 
-./generate_warnings.py 170 200 | ./log_errors.py testB 1 
-./generate_warnings.py 110 200 | ./log_errors.py testB 2 
-./generate_warnings.py 30 200 | ./log_errors.py testB 3 
-./generate_warnings.py 10 200 | ./log_errors.py testB 4 
+test/tools/generate_warnings.py 190 200 | ./filter_errorlog.py testB 1 
+test/tools/generate_warnings.py 170 200 | ./filter_errorlog.py testB 2 
+test/tools/generate_warnings.py 110 200 | ./filter_errorlog.py testB 3 
+test/tools/generate_warnings.py 30 200 | ./filter_errorlog.py testB 4
+test/tools/generate_warnings.py 10 200 | ./filter_errorlog.py testB 5 
 
-./generate_warnings.py 150 200 | ./log_errors.py testC 0 
-./generate_warnings.py 150 200 | ./log_errors.py testC 1 
-./generate_warnings.py 150 200 | ./log_errors.py testC 2 
-./generate_warnings.py 140 200 | ./log_errors.py testC 3 
-./generate_warnings.py 130 200 | ./log_errors.py testC 4 
+test/tools/generate_warnings.py 150 200 | ./filter_errorlog.py testC 1 
+test/tools/generate_warnings.py 150 200 | ./filter_errorlog.py testC 2 
+test/tools/generate_warnings.py 150 200 | ./filter_errorlog.py testC 3 
+test/tools/generate_warnings.py 140 200 | ./filter_errorlog.py testC 4 
+test/tools/generate_warnings.py 130 200 | ./filter_errorlog.py testC 5 

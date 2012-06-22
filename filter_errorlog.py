@@ -42,6 +42,7 @@ def parse_line(line):
         out += re.sub(r'^error:','ERROR:',line,flags=re.I)
     else:
         token_type = TYPE_IGNORED
+    ret_val = (out,token_type)
     return (out,token_type)
 
 
@@ -51,7 +52,7 @@ def parse_build(job,build,instream,start_state=None,mprint=print):
 
     mprint("----------[START:{0}({1})]----------".format(job,build))
     for line in instream:
-        token = parse_line(line)
+        token = parse_line(re.sub(r'\n','',line))
         txt = token[0]
         if token[1] == TYPE_WARNING:
             warning_count+=1
