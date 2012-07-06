@@ -2,6 +2,7 @@ NightOwl - Who tests the unittests?
 ===================================
 
 ![logo.png](/erikb85/master-thesis/raw/logo-1/planning/logo.png)
+
 `NightOwl` is the wise, selfless guard, that will build, test, deploy and
 analyse your software on your embedded target.
 
