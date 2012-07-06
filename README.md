@@ -1,22 +1,21 @@
-OpenEmbedded Under Control
-==============
+NightOwl - Who tests the unittests?
+===================================
 
-`OpenEmbedded Under Control` is a early alpha platform for automating your
-product development process and recieving fast and precise feedback about the
-problems your OpenEmbedded project might have.
+![logo.png](/erikb85/master-thesis/raw/logo-1/planning/logo.png)
+`NightOwl` is the wise, selfless guard, that will build, test, deploy and
+analyse your software on your embedded target.
 
 At the moment it allows you to filter your warnings and errors from your
 `bitbake` outputs (or logs) and generate a graph over Error- and Warning-
-development over the last builds.
-
-Further development is planned, of course, in form of a Master's thesis.
-Finally `opencontrol` should be as powerful in managing your project dev as
+development over the last builds. Further development is planned, of course,
+in form of a Master's thesis. Finally `NightOwl` should be as powerful in
+managing your project's development as
 [phpUnderControl|phpundercontrol/phpUnderControl].
 
 Installation
 ------------
 
-To get started you need: Linux, Python2.7, matplotlib and `/bin/sh`.
+To get started you need: Linux, Python2.7, matplotlib and a shell.
 
 
 Getting Started
@@ -75,3 +74,10 @@ Code:
     $ cat error.log | ./error_to_json.py | grep count | ./graph.py build-error Show-Errors
 
 ![build-error.png](opencontrol/raw/master/data/build-error.png)
+
+Further Plans
+-------------
+
+green = tool
+blue = data files and formats
+![structure.png](/erikb85/master-thesis/raw/struct-1/planning/system-structure.png)
