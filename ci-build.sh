@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PRE=nightowl
 ERROR_LOG=$PRE-error.log
