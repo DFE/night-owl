@@ -83,7 +83,6 @@ def main():
     plt.legend()
     plt.title(args.title)
     plt.savefig(args.filename)
-    plt.show()
 
 
 if __name__ == '__main__':
