@@ -68,13 +68,15 @@ def main():
     #all this stuff just reads the json and tries to put it into a plot()
     for line in sys.stdin:
         msgjson = json.loads(line)
-        print msgjson
         if msgjson['type'] == TYPE_WARN_COUNT:
             warnings = append_msgline(warnings,warnings[0].size,float(msgjson['count']))
         elif msgjson['type'] == TYPE_ERROR_COUNT:
             errors = append_msgline(errors,errors[0].size,float(msgjson['count']))
         else:
             raise Exception("Strange type "+msgjson['type']+"!")
+    print "warn0", warnings[0]
+    print "warn1", warnings[1]
+    print "format", args.format_warnings
     plt.plot(warnings[0],warnings[1],args.format_warnings,label="Warnings")
     plt.plot(errors[0],errors[1],args.format_errors,label="Errors")
     plt.axis([0,max(warnings[0].max(),errors[0].max())*1.1,0,max(warnings[1].max(),errors[1].max())*1.1])
