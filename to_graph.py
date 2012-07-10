@@ -18,6 +18,8 @@ import re
 import argparse
 import json
 import numpy as np
+import matplotlib
+matplotlib.use('AGG') #nessesary here for generating output without a window object
 import matplotlib.pyplot as plt
 
 from constants import *
@@ -74,11 +76,6 @@ def main():
             errors = append_msgline(errors,errors[0].size,float(msgjson['count']))
         else:
             raise Exception("Strange type "+msgjson['type']+"!")
-    print "warn0", warnings[0]
-    print "warn1", warnings[1]
-    print "format", args.format_warnings
-    import os
-    print ("display env", os.environ['DISPLAY'])
     plt.plot(warnings[0],warnings[1],args.format_warnings,label="Warnings")
     plt.plot(errors[0],errors[1],args.format_errors,label="Errors")
     plt.axis([0,max(warnings[0].max(),errors[0].max())*1.1,0,max(warnings[1].max(),errors[1].max())*1.1])
