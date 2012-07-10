@@ -53,7 +53,7 @@ beginning of each line. Then you import as 2 commands the important python
 libraries. Afterwards you create a small diagram and show it. You should see
 something like this:
 
-<center>![plotter.png](night-owl/raw/master/data/plotter-screen.png)</center>
+<center>![plotter.png](data/plotter-screen.png)</center>
 
 If you can't start python, or get another version or don't see a diagram after
 `plt.show()` then something is wrong. Only continue after all these steps work.
@@ -156,7 +156,7 @@ Code:
     $ bitbake MLO | ./log_errors.py testBuild 3 >>error.log
     $ cat error.log | ./error_to_json.py | grep count | ./graph.py build-error Show-Errors
 
-![build-error.png](night-owl/raw/master/data/build-error.png)
+![build-error.png](data/build-error.png)
 
 Further Plans
 -------------
