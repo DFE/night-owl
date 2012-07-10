@@ -77,6 +77,8 @@ def main():
     print "warn0", warnings[0]
     print "warn1", warnings[1]
     print "format", args.format_warnings
+    import os
+    print ("display env", os.environ['DISPLAY'])
     plt.plot(warnings[0],warnings[1],args.format_warnings,label="Warnings")
     plt.plot(errors[0],errors[1],args.format_errors,label="Errors")
     plt.axis([0,max(warnings[0].max(),errors[0].max())*1.1,0,max(warnings[1].max(),errors[1].max())*1.1])
