@@ -1,8 +1,7 @@
 #!/bin/sh
 # -*- coding:utf-8 -*-
 #
-# Open Embedded Under Control - the Continuous Integration and Controlling platform for OpenEmbedded Projects
-# OEUC error-log - a framework for logging and presentation of errors and warnings
+# NightOwl - who tests your unit tests?
 #
 # Copyright (C) 2012 DResearch Fahrzeugelektronik GmbH
 # Written and maintained by Erik Bernoth <bernoth@dresearch-fe.de>
