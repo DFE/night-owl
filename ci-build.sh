@@ -48,5 +48,5 @@ FORMAT_ERRORS=r-o
 #-----------------------------------
 # here begins the action
 #-----------------------------------
-cat $THIS/../builds/$BUILD_NUMBER/log | $THIS/filter_errorlog.py $JOB_NAME $BUILD_NUMBER >>$THIS/$ERROR_LOG
-cat $THIS/$ERROR_LOG | $THIS/to_json.py | grep count | $THIS/to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
+cat $THIS/../builds/$BUILD_NUMBER/log | $THIS/filter_errorlog.py $JOB_NAME $BUILD_NUMBER >>$ERROR_LOG
+cat $ERROR_LOG | $THIS/to_json.py | grep count | $THIS/to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
