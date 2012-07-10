@@ -47,5 +47,5 @@ FORMAT_ERRORS=r-o
 #-----------------------------------
 # here begins the action
 #-----------------------------------
-cat $1/log | ./filter_errorlog.py >>$ERROR_LOG
+cat $1/log | ./filter_errorlog.py $JOB_NAME $BUILD_NUMBER >>$ERROR_LOG
 cat $ERROR_LOG | ./to_json.py | grep count | ./to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
