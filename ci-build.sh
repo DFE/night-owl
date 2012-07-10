@@ -12,11 +12,12 @@
 # 2 of the License, or (at your option) any later version.
 #
 
-
-
 #-----------------------------------
 # preparations
 #-----------------------------------
+
+#Where this script lies. This is import for calling the other scripts
+THIS=$(dirname $0)
 
 #this is how Jenkins should recognise the results as artifacts
 #don't change that, if u are not familiar with Jenkins' artifacts
@@ -47,5 +48,5 @@ FORMAT_ERRORS=r-o
 #-----------------------------------
 # here begins the action
 #-----------------------------------
-cat ../builds/$BUILD_NUMBER/log | ./filter_errorlog.py $JOB_NAME $BUILD_NUMBER >>$ERROR_LOG
-cat $ERROR_LOG | ./to_json.py | grep count | ./to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
+cat $THIS/../builds/$BUILD_NUMBER/log | $THIS/filter_errorlog.py $JOB_NAME $BUILD_NUMBER >>$THIS/$ERROR_LOG
+cat $THIS/$ERROR_LOG | $THIS/to_json.py | grep count | $THIS/to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
