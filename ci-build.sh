@@ -19,9 +19,16 @@
 #Where this script lies. This is import for calling the other scripts
 THIS=$(dirname $0)
 
+#where the artifacts will be stored
+RES_DIR="$THIS/../build/night-owl"
+mkdir -p $RES_DIR
+
+#where to find the build logs
+BUILD_LOG=$(ls -1 $THIS/../build/tmp-eglibc/cooker.log.* | sort -n | tail -1)
+
 #this is how Jenkins should recognise the results as artifacts
 #don't change that, if u are not familiar with Jenkins' artifacts
-PRE=nightowl 
+PRE=$RES_DIR/night-owl 
 
 #the name of the error-log File. Leave the $PRE in the beginning
 ERROR_LOG=$PRE-error.log
@@ -31,13 +38,13 @@ ERROR_LOG=$PRE-error.log
 GRAPH_FILE=$PRE-error
 
 #name written on top of the plot
-GRAPH_NAME=Errors/Warnings\ per\ Build
+GRAPH_NAME="Errors/Warnings per Build"
 
 #name of the x-axis
-LABEL_X=Build\ no.
+LABEL_X="Build no."
 
 #name of the y-axis
-LABEL_Y=No.\ of\ Errors/Warnings
+LABEL_Y="No. of Errors/Warnings"
 
 #format string
 FORMAT_WARNINGS=g--
@@ -45,8 +52,16 @@ FORMAT_WARNINGS=g--
 #format string
 FORMAT_ERRORS=r-o
 
+
 #-----------------------------------
 # here begins the action
 #-----------------------------------
-cat $THIS/../builds/$BUILD_NUMBER/log | $THIS/filter_errorlog.py $JOB_NAME $BUILD_NUMBER >>$ERROR_LOG
+
+JOB="nightowl-job"
+BUILD_NUM=$(date +%s)
+
+[ $# -ge 1 ] && JOB="$1"
+[ $# -ge 2 ] && BUILD_NUM="$2"
+
+cat $BUILD_LOG | $THIS/filter_errorlog.py $JOB $BUILD_NUM >>$ERROR_LOG
 cat $ERROR_LOG | $THIS/to_json.py | grep count | $THIS/to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
