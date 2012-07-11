@@ -13,13 +13,6 @@ in form of a Master's thesis. Finally `NightOwl` should be as powerful in
 managing your project's development as
 [phpUnderControl|phpundercontrol/phpUnderControl].
 
-Installation
-------------
-
-To get started you need: Linux (Ubuntu 12.04 tested), Python2.7, matplotlib
-and a shell.
-
-
 Getting Started
 ---------------
 
