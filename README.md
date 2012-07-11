@@ -95,6 +95,9 @@ your job's errors and warnings over time. Of course this diagram will not show
 so much interesting stuff after 1 or 2 builds. You have to wait some days
 until your error.log gets filled up a little.
 
+Last but not least, you can enable auto refresh on your project page. This way
+your diagrams get automatically updated in your view.
+
 Skript Examples
 ---------------
 
