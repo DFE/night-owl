@@ -31,7 +31,7 @@ without a too fancy configuration. So at first you should make sure,
 that you have all the tools installed that you will need. Just execute
 the following line of code in a Terminal shell:
 
-    $ sudo apt-get install git jenkins python2.7 python-matplotlib
+    $ sudo apt-get install git jenkins python2.7 python-numpy python-matplotlib
 
 Now check if everything works correclty. Go to your Terminal and insert the
 following commands:
