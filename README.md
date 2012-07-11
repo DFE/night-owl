@@ -13,8 +13,8 @@ in form of a Master's thesis. Finally `NightOwl` should be as powerful in
 managing your project's development as
 [phpUnderControl|phpundercontrol/phpUnderControl].
 
-Getting Started
----------------
+Getting Started - the Tutorial
+------------------------------
 
 Because the project is not yet very far developed, this tutorial isn't either.
 So I'd like to say sorry for the edges you might hit on your way.
@@ -61,7 +61,7 @@ documentation for this.
 The last prerequesit is to download the night-owl sourcecode. To do that, `cd`
 in your shell to whatever place you like. Then write the following:
 
-    $ git clone git@github.com:DFE/night-owl
+    $ git clone git://github.com/DFE/night-owl.git
 
 Now you will see that you have created a subfolder, called `night-owl`, with
 all the components that you will need to get night-owl to work. The path
