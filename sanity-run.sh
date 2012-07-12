@@ -64,4 +64,4 @@ BUILD_NUM=$(date +%s)
 [ $# -ge 2 ] && BUILD_NUM="$2"
 
 cat $BUILD_LOG | $THIS/filter_errorlog.py $JOB $BUILD_NUM >>$ERROR_LOG
-cat $ERROR_LOG | $THIS/to_json.py | grep count | $THIS/to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
+cat $ERROR_LOG | $THIS/to_json.py | grep -P "(WARN_COUNT)|(ERR_COUNT)" | $THIS/to_graph.py "$GRAPH_FILE" "$GRAPH_NAME" "$LABEL_X" "$LABEL_Y" "$FORMAT_WARNINGS" "$FORMAT_ERRORS"
