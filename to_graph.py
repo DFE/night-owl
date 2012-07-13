@@ -18,7 +18,7 @@ import argparse
 import json
 import numpy as np
 import matplotlib
-matplotlib.use('AGG') #nessesary here for generating output without a window object
+#matplotlib.use('AGG') #nessesary here for generating output without a window object
 import matplotlib.pyplot as plt
 
 from constants import *
@@ -56,8 +56,10 @@ def main():
                             help="the written title over the plot")
     parser.add_argument("xlabel",nargs="?",default="build no.",type=str,
                             help="label for x-axis")
-    parser.add_argument("ylabel",nargs="?",default="No. of Errors/Warnings",
-                            type=str,help="label for y-axis")
+    parser.add_argument("ylabel_warn",nargs="?",default="No. of Warnings",
+                            type=str,help="label for left y-axis, i.e. warnings")
+    parser.add_argument("ylabel_err",nargs="?",default="No. of Errors",
+                            type=str,help="label for right y-axis, i.e. errors")
     parser.add_argument("format_warnings",nargs="?",type=str,default="g--",
                             help="Matlab formatting for the warnings")
     parser.add_argument("format_errors",nargs="?",type=str,default="r-o",
@@ -75,12 +77,20 @@ def main():
             errors = append_msgline(errors,errors[0].size,float(msgjson['count']))
         else:
             raise Exception("Strange type "+msgjson['type']+"!")
-    plt.plot(warnings[0],warnings[1],args.format_warnings,label="Warnings")
-    plt.plot(errors[0],errors[1],args.format_errors,label="Errors")
-    plt.axis([0,max(warnings[0].max(),errors[0].max())*1.1,0,max(warnings[1].max(),errors[1].max())*1.1])
-    plt.xlabel(args.xlabel)
-    plt.ylabel(args.ylabel)
-    plt.legend()
+ 
+    warn_plot = plt.figure().add_subplot(111)
+    warn_plot.set_xlabel(args.xlabel)
+    warn_plot.set_ylabel(args.ylabel_warn)
+
+    warn_plot.plot(warnings[0],warnings[1],args.format_warnings, label="Warnings")
+    warn_plot.axis([0, warnings[0].max()*1.1, 0, warnings[1].max()*1.1])
+
+    err_plot = warn_plot.twinx()
+    err_plot.set_xlabel(args.xlabel)
+    err_plot.set_ylabel(args.ylabel_err)
+    err_plot.plot(errors[0],errors[1],args.format_errors,label="Errors")
+    err_plot.axis([0, errors[0].max()*1.15, 0, errors[1].max()*1.15])
+
     plt.title(args.title)
     plt.savefig(args.filename)
 

@@ -43,8 +43,11 @@ GRAPH_NAME="Errors/Warnings per Build"
 #name of the x-axis
 LABEL_X="Build no."
 
-#name of the y-axis
-LABEL_Y="No. of Errors/Warnings"
+#name of the left y-axis
+LABEL_Y_LEFT="No. of Warnings"
+
+#name of the right y-axis
+LABEL_Y_RIGHT="No. of Errors"
 
 #format string
 FORMAT_WARNINGS=g--
@@ -71,6 +74,7 @@ cat $ERROR_LOG | \
         "$GRAPH_FILE" \
         "$GRAPH_NAME" \
         "$LABEL_X" \
-        "$LABEL_Y" \
+        "$LABEL_Y_LEFT" \
+        "$LABEL_Y_RIGHT" \
         "$FORMAT_WARNINGS" \
         "$FORMAT_ERRORS"
