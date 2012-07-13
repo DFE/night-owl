@@ -33,6 +33,9 @@ PRE=$RES_DIR/night-owl
 #the name of the error-log File. Leave the $PRE in the beginning
 ERROR_LOG=$PRE-error.log
 
+# Name of the compiler warnigs per package log file
+CC_WARNINGS_LOG=$PRE-cc-warn.log
+
 #name of the graphi-file.
 #Leave the $PRE in the beginning and no file ending needed
 GRAPH_FILE=$PRE-error
@@ -66,7 +69,11 @@ BUILD_NUM=$(date +%s)
 [ $# -ge 1 ] && JOB="$1"
 [ $# -ge 2 ] && BUILD_NUM="$2"
 
+
+# Generate cumulated error log
 cat $BUILD_LOG | $THIS/filter_errorlog.py $JOB $BUILD_NUM >>$ERROR_LOG
+
+# now paint a graph from all builds recorded so far
 cat $ERROR_LOG | \
     $THIS/to_json.py | \
     grep -P "(WARN_COUNT)|(ERR_COUNT)" | \
@@ -78,3 +85,20 @@ cat $ERROR_LOG | \
         "$LABEL_Y_RIGHT" \
         "$FORMAT_WARNINGS" \
         "$FORMAT_ERRORS"
+
+# Finally collect compiler warnings of all components
+echo -e "\n\n--------\n $JOB $BUILD_NUM\n----" >> $CC_WARNINGS_LOG
+export overall=0 count=0
+find "$THIS/../build/tmp-eglibc/work/" -name 'log.do_compile' | \
+    { 
+        while read file; do 
+            num=$(grep -ci warning $file)
+            if [ $num -gt 0 ] ; then 
+                name=$(echo "$file" | sed -e 's/.*tmp-eglibc\/work\/[^/]*\/\([^/]*\)\/.*/\1/')
+                printf "%10s warnings in %s\n" $num "$name" >>$CC_WARNINGS_LOG
+                overall=$((overall + num))
+                ((count ++))
+            fi
+          done; 
+          echo -e "\n----\nCounted $overall warnings in $count packages\n--------" >> $CC_WARNINGS_LOG;
+    }
