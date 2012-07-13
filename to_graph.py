@@ -18,7 +18,7 @@ import argparse
 import json
 import numpy as np
 import matplotlib
-#matplotlib.use('AGG') #nessesary here for generating output without a window object
+matplotlib.use('AGG') #nessesary here for generating output without a window object
 import matplotlib.pyplot as plt
 
 from constants import *
