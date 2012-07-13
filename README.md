@@ -80,9 +80,9 @@ Now add to your shell script in your Jenkins job the following line:
     # ... other stuff you are doing in your job script
     /bin/bash -x <night-owl-path>/ci-build.sh
 
-and replace your `<night-owl-path>`. Then make sure you Archive artifacts
-( in your Jenkins config in `Post-build Actions` and add
-`build/night-owl/night-owl-error.l` to your filters.)
+and replace your `<night-owl-path>`. Then make sure your Jenkins recognises
+your archived artifacts (in your Jenkins config in `Post-build Actions` and
+add `build/night-owl/night-owl-error.*` to your filters.)
 
 After your next build you should see 2 new artifacts:
 
@@ -165,6 +165,6 @@ Code:
 Further Plans
 -------------
 
-green = tool
-blue = data files and formats
+ * green = tool
+ * blue = data files and formats
 ![structure.png](/erikb85/master-thesis/raw/struct-1/planning/system-structure.png)
