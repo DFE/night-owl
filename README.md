@@ -78,7 +78,7 @@ folder hierarchy, that will be important.
 Now add to your shell script in your Jenkins job the following line:
 
     # ... other stuff you are doing in your job script
-    /bin/bash -x <night-owl-path>/ci-build.sh
+    /bin/bash -x <night-owl-path>/sanity-run.sh
 
 and replace your `<night-owl-path>`. Then make sure your Jenkins recognises
 your archived artifacts (in your Jenkins config in `Post-build Actions` and
@@ -106,7 +106,7 @@ runs until your error.log gets filled up a little.
 Last but not least, you can enable auto refresh on your project page. This way
 your diagrams get automatically updated in your view.
 
-Skript Examples
+Script Examples
 ---------------
 
 here you can see some examples of what you can do with the night-owl scripts
