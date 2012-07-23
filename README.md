@@ -1,5 +1,6 @@
-NightOwl - Who tests the unittests?
-===================================
+NightOwl
+========
+*Who tests the unittests?*
 
 ![logo.png](/erikb85/master-thesis/raw/logo-1/planning/logo.png)
 
