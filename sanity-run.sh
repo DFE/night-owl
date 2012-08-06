@@ -26,6 +26,9 @@ mkdir -p $RES_DIR
 #where to find the build logs
 BUILD_LOG=$(ls -1 $THIS/../build/tmp-eglibc/cooker.log.* | sort -n | tail -1)
 
+#where the data is stored
+DB_NAME="$THIS/../build/night-owl/logging.db"
+
 #this is how Jenkins should recognise the results as artifacts
 #don't change that, if u are not familiar with Jenkins' artifacts
 PRE=$RES_DIR/night-owl 
@@ -71,7 +74,8 @@ BUILD_NUM=$(date +%s)
 
 
 # Generate cumulated error log
-cat $BUILD_LOG | $THIS/filter_errorlog.py $JOB $BUILD_NUM >>$ERROR_LOG
+./log_to_db.sh $BUILD_LOG $DB_NAME #new
+cat $BUILD_LOG | $THIS/filter_errorlog.py $JOB $BUILD_NUM >>$ERROR_LOG #old
 
 # now paint a graph from all builds recorded so far
 cat $ERROR_LOG | \
