@@ -34,6 +34,7 @@ echo "start parsing..."
 cat $1 \
     | ./parse_signals.py \
     | sed "s/^(/&NULL,/" \
+    | sed "s/)$/, datetime('now')&/" \
     | sed 's/.*/INSERT INTO signal VALUES&;/' \
     | sqlite3 $2
 echo "Done."

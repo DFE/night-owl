@@ -20,13 +20,15 @@ fi
 sqlite3 $1 "CREATE TABLE signal ( \
 signal_tid INTEGER PRIMARY KEY, \
 type TEXT, \
+attempt INTEGER, \
 msg TEXT, \
 cat TEXT, \
 recipe TEXT, \
 cmd TEXT, \
 file TEXT, \
 row INTEGER, \
-col INTEGER \
+col INTEGER, \
+time TEXT \
 );"
 
 sqlite3 $1 ".schema signal"
