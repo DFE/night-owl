@@ -21,7 +21,7 @@ import inspect
 sys.path.append(os.path.abspath(
     os.path.dirname(inspect.getfile(inspect.currentframe()))+"/.."))
 
-import framework
+import framework as fw
 
 class TestSignalAccumulator(unittest.TestCase):
     """
@@ -34,12 +34,9 @@ class TestSignalAccumulator(unittest.TestCase):
         #prepare
         expected_count = 1
         attempt=1
-        input_ = [Signal(i,attempt=attempt) for i in range(expected_count)]
+        input_ = [fw.Signal(i,attempt=attempt) for i in range(expected_count)]
         #exec
-        try:
-            sut = framework.SignalAccumulator(attempt=attempt,input_)
-        except framework.IgnoredWarning:
-            self.fail("shouldn't have ignored input '{}'".format(input_))
+        sut = fw.SignalAccumulator(*input_,attempt=attempt)
         #assert
         self.assertEqual(expected_count,sut.count,
                 self.ASSERT_TXT.format(expected_count,sut.count))
@@ -49,12 +46,9 @@ class TestSignalAccumulator(unittest.TestCase):
         #prepare
         expected_count = 3
         attempt=1
-        input_ = [Signal(i,attempt=attempt) for i in range(expected_count)]
+        input_ = [fw.Signal(i,attempt=attempt) for i in range(expected_count)]
         #exec
-        try:
-            sut = framework.SignalAccumulator(attempt=attempt,*input_)
-        except framework.IgnoredWarning:
-            self.fail("shouldn't have ignored input '{}'".format(input_))
+        sut = fw.SignalAccumulator(*input_,attempt=attempt)
         #assert
         self.assertEqual(expected_count,sut.count,
                 self.ASSERT_TXT.format(expected_count,sut.count))
