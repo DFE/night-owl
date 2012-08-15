@@ -34,15 +34,15 @@ class TestSignalAccumulator(unittest.TestCase):
         #prepare
         expected_count = 1
         attempt=1
-        input_ = [fw.Signal(i,attempt=attempt) for i in range(expected_count)]
+        input_ = fw.Signal(1,attempt=attempt)
         #exec
-        sut = fw.SignalAccumulator(*input_,attempt=attempt)
+        sut = fw.SignalAccumulator(input_,attempt=attempt)
         #assert
         self.assertEqual(expected_count,sut.count,
                 self.ASSERT_TXT.format(expected_count,sut.count))
 
 
-    def test_add_multi(self):
+    def test_add_more(self):
         #prepare
         expected_count = 3
         attempt=1
@@ -55,11 +55,29 @@ class TestSignalAccumulator(unittest.TestCase):
 
 
     def test_add_ignore_malformed(self):
-        self.fail("not yet implemented")
+        #prepare
+        expected_count = 0
+        attempt=1
+        dont_match=12
+        input_ = fw.Signal(1,attempt=attempt)
+        #exec+assert
+        with self.assertRaises(fw.IgnoredWarning):
+            sut = fw.SignalAccumulator(input_,attempt=dont_match)
 
 
     def test_make_many(self):
-        self.fail("not yet implemented")
+        #prepare
+        exp_counts = [3,4,5]
+        input_ = [fw.Signal(tid,attempt=atm)
+                        for atm,count in enumerate(exp_counts)
+                        for tid in range(count)]
+        #exec
+        result = fw.SignalAccumulator.make_many(*input_)
+        #assert
+        for sut in result:
+            self.assertEqual(exp_counts[sut.attempt],sut.count,
+                self.ASSERT_TXT.format(exp_counts[sut.attempt],sut.count) \
+                + "for {}".format(sut))
 
 
 

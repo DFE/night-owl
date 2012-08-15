@@ -17,12 +17,16 @@ manages helper and ORM classes.
 """
 
 import json
+import numpy as np
 
 class IgnoredWarning(Warning):
     "is raised, when elements in a sequence are ignored"
     pass
 
 
+class BadParamException(Exception):
+    """is raised, when paramters are given in an incorrect way"""
+    pass
 
 class Signal(object):
     """
@@ -37,16 +41,16 @@ class Signal(object):
     def __init__(self,signal_tid=None,type_=None,attempt=None,msg=None,
             cat=None,recipe=None,cmd=None,file_=None,row=None,col=None,
             time=None):
-        self.signal_tid = signal_tid if signal_tid else -1
+        self.signal_tid = signal_tid if signal_tid >= 0 else -1
         self.type_ = type_ if type_ else ""
-        self.attempt = attempt if attempt else -1
+        self.attempt = attempt if attempt >= 0 else -1
         self.msg = msg if msg else ""
         self.cat = cat if cat else ""
         self.recipe = recipe if recipe else ""
         self.cmd = cmd if cmd else ""
         self.file_ = file_ if file_ else ""
-        self.row = row if row else -1
-        self.col = col if col else -1
+        self.row = row if row >= 0 else -1
+        self.col = col if col >= 0 else -1
         self.time = time if time else ""
 
 
@@ -97,8 +101,10 @@ class SignalAccumulator(object):
     maintains a group of signals
     """
 
-    def __init__(self, type_, *signals, **kwargs):
-        self.type_ = type_
+    DEFAULT_TYPE = "NO_TYPE"
+
+    def __init__(self, *signals, **kwargs):
+        self.type_ = kwargs.pop("type_", self.DEFAULT_TYPE)
         self.attempt = kwargs.pop("attempt",-1)
         self.count = kwargs.pop("count",0)
         self.add_signals(*signals)
@@ -108,7 +114,7 @@ class SignalAccumulator(object):
         for signal in signals:
             if signal.attempt != self.attempt:
                 raise IgnoredWarning("Attempt {} isn't mine ({}) -> " \
-                        + "signal ignored".format(signal.attempt, self.attempt))
+                       + "signal ignored".format(signal.attempt, self.attempt))
                 continue
             else:
                 self.count +=1
@@ -117,7 +123,7 @@ class SignalAccumulator(object):
 
 
     @classmethod
-    def make_many(cls,signal_iterator):
+    def make_many(cls,*signals):
         """
         can be used, when you have a long list of signals of different attempts and
         you want to automatically create a list of :py:class:SignalAccumulator
@@ -126,15 +132,22 @@ class SignalAccumulator(object):
         :param signal_iterator: should deliver :py:class:signal.Signal objects
         :return: a generator for all :py:class:SignalAccumulator objects
         """
-        # TODO integrate changes from init and add functions
         accumulators = {}
-        for signal in signal_iterator:
+        for signal in signals:
             if signal.attempt not in accumulators:
-                accumulators[signal.attempt] = SignalAccumulator(signal.attempt)
-            accumulators[signal.attempt].add_signal(signal)
+                accumulators[signal.attempt] = cls(attempt=signal.attempt)
+            accumulators[signal.attempt].add_signals(signal)
+        #the dict was just a helper, users should just get an iterable
         keys = accumulators.keys()
         keys.sort()
         return (accumulators[k] for k in keys)
+
+    def __str__(self):
+        return "SignalAccumulator('{}',{},{})".format(
+                self.type_,
+                self.attempt,
+                self.count
+        )
 
 
 
@@ -148,33 +161,49 @@ class Graph(object):
     the old graph!
     """
 
-    def __init__(self,name, signal_accumulators, xlabel, ylabel, formatting):
+    DEFAULT_NAME="NO_NAME"
+    DEFAULT_XLABEL="x-axis"
+    DEFAULT_YLABEL="y-axis"
+    DEFAULT_FORMATTING="r--"
+
+    def __init__(self, *signal_accumulators, **kwargs):
         """
-        :param name: how the graph will be called in the diagram
         :param signal_accumulators: an iterator for signal_accumulators
+        :param name: how the graph will be called in the diagram
         :param ylabel: naming of the corresponding y-axis in the diagram
         :param formatting: Matlab style formatting for this graph
         """
-        self.name = name
-        self.__signal_accumulators = tuple(signal_accumulators)
-        self.xlabel = xlabel
-        self.ylabel = ylabel
-        self.formatting = formatting
+        self.__signal_accumulators = signal_accumulators
+        self.name = kwargs.pop("name",self.DEFAULT_NAME)
+        self.xlabel = kwargs.pop("xlabel",self.DEFAULT_XLABEL)
+        self.ylabel = kwargs.pop("ylabel",self.DEFAULT_YLABEL)
+        self.formatting = kwargs.pop("formatting",self.DEFAULT_FORMATTING)
         self.__xdata = np.array([])
         self.__ydata = np.array([])
         self.__applied = False
 
 
-    def __apply_accumulators():
+    def __apply_accumulators(self):
         """
         generate pylab parsable data from accumulators
         """
         self.__xdata = np.array([])
         self.__ydata = np.array([])
         for acc in self.signal_accumulators:
-            self.__xdata = __array_append(self.__xdata,acc.attempt)
-            self.__ydata = __array_append(self.__ydata,acc.count)
+            self.__xdata = self.__array_append(self.__xdata,acc.attempt)
+            self.__ydata = self.__array_append(self.__ydata,acc.count)
         self.__applied = True
+
+
+    def __array_append(self, in_a,in_b):
+        """
+        append a numpy array to another
+        :param in_a: a numpy array
+        :param in_b: a numpy array or a number
+        """
+        types = (int,float,long,complex)
+        in_b = np.array([in_b]) if isinstance(in_b,types) else in_b
+        return np.concatenate((in_a,in_b))
 
 
     @property
@@ -189,12 +218,8 @@ class Graph(object):
 
 
     @signal_accumulators.setter
-    def signal_accumulators(self,value):
-        """"""
-        # FIXME: the tuple() call is just a workaround, caused by the
-        #        dependency between __signal_accumulators and __x_data/__y_data
-        #        which are both generated from __singal_accumulators
-        self.__signal_accumulators = tuple(value)
+    def signal_accumulators(self,*values):
+        self.__signal_accumulators = values
         self.__applied = False
 
 
@@ -224,6 +249,16 @@ class Graph(object):
         if not self.__applied:
             self.__apply_accumulators()
         return self.__ydata
+
+    def __str__(self):
+        return "Graph('{}','{}','{}','{}',{},{})".format(
+                self.name,
+                self.xlabel,
+                self.ylabel,
+                self.formatting,
+                self.x_data,
+                self.y_data
+        )
 
 
 
