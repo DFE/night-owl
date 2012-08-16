@@ -18,7 +18,7 @@ contains everything related to the user interface for night-owl.
 
 from __future__ import print_function
 
-import framework
+import framework as fw
 
 class NightOwl(object):
     """
@@ -28,14 +28,35 @@ class NightOwl(object):
     DEFAULT_FILENAME = "night-owl.png"
     DEFAULT_TITLE = "Night Owl Errors/Warnings"
 
+    TYPE_WARNING = "WARNING"
+    TYPE_ERROR = "ERROR"
+
     def __init__(self):
         pass
 
-    def draw_diagram(self):
-        graphs = []
-        diagram = Diagram(
-            DEFAULT_FILENAME,
-            DEFAULT_TITLE,
-            graphs
-        )
-        diagram.draw()
+
+    def read_json(input_):
+        """
+        creates a generator expression for reading json from standard input.
+
+        :param input_: an interable or a single line of JSON txt
+        :return: a generator expression of :py:class:framework.Signal objects
+        """
+        return fw.Signal.make_from_json(input_)
+
+
+    def draw_warning_error_graph(signals):
+        """
+        draws a diagram of an :py:class:collections.Iterable of Signal objects
+        """
+        accumulators = fw.SignalAccumulator.make_many(signals)
+        warning_accums = (accumulators[k] for k in keys
+                        if accumulators[k].type_ = TYPE_WARNING)
+        error_accums = (accumulators[k] for k in keys
+                        if accumulators[k].type_ = TYPE_ERRORS)
+
+
+
+
+if __name__ == "__main__":
+    read_json(sys.stdin,(fw.Signal.TYPE_WARNING,fw.Signal.TYPE_ERROR))

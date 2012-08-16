@@ -37,6 +37,8 @@ class Signal(object):
     functionality should be added.
     """
 
+    TYPE_ERROR = "ERROR"
+    TYPE_WARNING = "WARNING"
 
     def __init__(self,signal_tid=None,type_=None,attempt=None,msg=None,
             cat=None,recipe=None,cmd=None,file_=None,row=None,col=None,
@@ -73,9 +75,10 @@ class Signal(object):
 
 
     @classmethod
-    def make_from_json(cls,txt):
+    def __make_single_from_json(cls,txt):
         """
         is a factory function to parse directly from json
+
         :param txt: is a :py:class:Signal as a valid json string
         :return: :py:class:Signal object
         """
@@ -93,6 +96,23 @@ class Signal(object):
                 json_["col"],
                 json_["time"],
         )
+
+
+    @classmethod
+    def make_from_json(cls,input_):
+        """
+        is a factory function that parses lines of JSON to
+        :py:class:framework.Signal objects.
+
+        The idea of reading Iterables and returning generators keeps in mind,
+        that this method will likely handle thousands of Signal instances.
+
+        :param input_: an iterable or a single line of JSON text
+        :return: a generator that creates Signal objects
+        """
+        import collections as c
+        data = input_ if isinstance(input_,c.Iterable) else (input_,)
+        return (cls.__make_single_from_json(txt) for txt in data)
 
 
 
@@ -113,21 +133,26 @@ class SignalAccumulator(object):
     def add_signals(self,*signals):
         for signal in signals:
             if signal.attempt != self.attempt:
-                raise IgnoredWarning("Attempt {} isn't mine ({}) -> " \
-                       + "signal ignored".format(signal.attempt, self.attempt))
+                raise IgnoredWarning(("Attempt {} isn't mine ({}) -> " \
+                      + "signal ignored").format(signal.attempt, self.attempt))
                 continue
+            elif signal.type_ != self.type_:
+                raise IgnoredWarning(("Type '{}' isn't mine '{}' -> " \
+                        + "signal ignored").format(signal.type_, self.type_)
             else:
                 self.count +=1
-
-
 
 
     @classmethod
     def make_many(cls,*signals):
         """
-        can be used, when you have a long list of signals of different attempts and
-        you want to automatically create a list of :py:class:SignalAccumulator
-        objects for each attempt.
+        can be used, when you have a long list of signals of different attempts
+        and you want to automatically create a list 
+        of :py:class:SignalAccumulator objects for each attempt.
+
+        FIXME: maybe this is all not nessesary anymore, because
+        :py:class:framework.Graph has now the responsibility to create
+        different :py:class:framework.SignalAccumulator objects?
 
         :param signal_iterator: should deliver :py:class:signal.Signal objects
         :return: a generator for all :py:class:SignalAccumulator objects
@@ -250,6 +275,7 @@ class Graph(object):
             self.__apply_accumulators()
         return self.__ydata
 
+
     def __str__(self):
         return "Graph('{}','{}','{}','{}',{},{})".format(
                 self.name,
@@ -275,14 +301,23 @@ class Diagram(object):
     DEFAULT_TITLE="Diagram"
     DEFAULT_GRAPH_LIST = []
 
+
     def __init__(self, filename=None, title=None,all_graphs=None):
         """
         :param filename: is the location, where the graph JPEG should be stored
         :param title: is the graph title that is written above the diagram
         """
-        self.filename = filename if filename else Diagram.EFAULT_FILENAME
-        self.title = title if title else Diagram.DEFAULT_TITLE
-        self.all_graphs = all_graphs if all_graphs else DEFAULT_GRAPH_LIST
+        self.filename = filename if filename else self.DEFAULT_FILENAME
+        self.title = title if title else self.DEFAULT_TITLE
+        self.all_graphs = all_graphs if all_graphs else self.DEFAULT_GRAPH_LIST
+
+    def add_signals(signals):
+        """
+        TODO: Create a new graph for every new signal type you spot, add a new
+              SignalAccumulator to every Graph for every attempt you spot
+              and then add the signals to the SignalAccumulators (which maybe
+              should be done indirectly through the Graph objects)
+        """
 
 
     def draw(self):
@@ -324,17 +359,24 @@ class Diagram(object):
         plt.savefig(self.filename)
         return self
 
-        def __init_plot(self,plot,graph):
-            """
-            does some of the repeatable pylab tasks on a plot object, which are
-            basically just data transfering tasks from a Graph object to the
-            plot object
-            """
+    def __init_plot(self,plot,graph):
+        """
+        does some of the repeatable pylab tasks on a plot object, which are
+        basically just data transfering tasks from a Graph object to the
+        plot object
+        """
 
-            plot.set_xlabel(graph.xlabel)
-            plot.set_ylabel(graph.ylabel)
-            plot.plot(graph.xdata, graph.ydata,graph.formatting,
-                    label=graph.name)
-            plot.axis([0,graph.xdata.max()*1.1,
-                        0,graph.ydata.max()*1.1])
-            return plot
+        plot.set_xlabel(graph.xlabel)
+        plot.set_ylabel(graph.ylabel)
+        plot.plot(graph.xdata, graph.ydata,graph.formatting,
+                label=graph.name)
+        plot.axis([0,graph.xdata.max()*1.1,
+                    0,graph.ydata.max()*1.1])
+        return plot
+
+    def __str__(self):
+        return "Diagram('{}','{}',{})".format(
+                self.filename,
+                self.title,
+                self.all_graphs
+        )
