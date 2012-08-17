@@ -19,10 +19,6 @@ manages helper and ORM classes.
 import json
 import numpy as np
 
-class IgnoredWarning(Warning):
-    "is raised, when elements in a sequence are ignored"
-    pass
-
 
 class BadParamException(Exception):
     """is raised, when paramters are given in an incorrect way"""
@@ -40,20 +36,32 @@ class Signal(object):
     TYPE_ERROR = "ERROR"
     TYPE_WARNING = "WARNING"
 
+    DEFAULT_TID = -1
+    DEFAULT_TYP = "NO_TYPE"
+    DEFAULT_ATM = -1
+    DEFAULT_MSG = ""
+    DEFAULT_CAT = ""
+    DEFAULT_REC = ""
+    DEFAULT_CMD = ""
+    DEFAULT_FIL = ""
+    DEFAULT_ROW = -1
+    DEFAULT_COL = -1
+    DEFAULT_TIM = "EMPTY"
+
     def __init__(self,signal_tid=None,type_=None,attempt=None,msg=None,
             cat=None,recipe=None,cmd=None,file_=None,row=None,col=None,
             time=None):
-        self.signal_tid = signal_tid if signal_tid >= 0 else -1
-        self.type_ = type_ if type_ else ""
-        self.attempt = attempt if attempt >= 0 else -1
-        self.msg = msg if msg else ""
-        self.cat = cat if cat else ""
-        self.recipe = recipe if recipe else ""
-        self.cmd = cmd if cmd else ""
-        self.file_ = file_ if file_ else ""
-        self.row = row if row >= 0 else -1
-        self.col = col if col >= 0 else -1
-        self.time = time if time else ""
+        self.signal_tid = signal_tid if signal_tid >= 0 else self.DEFAULT_TID
+        self.type_ = type_ if type_ is not None else self.DEFAULT_TYP
+        self.attempt = attempt if attempt >= 0 else self.DEFAULT_ATM
+        self.msg = msg if msg is not None else self.DEFAULT_MSG
+        self.cat = cat if cat else self.DEFAULT_CAT
+        self.recipe = recipe if recipe else self.DEFAULT_REC
+        self.cmd = cmd if cmd else self.DEFAULT_CMD
+        self.file_ = file_ if file_ else self.DEFAULT_FIL
+        self.row = row if row >= 0 else self.DEFAULT_ROW
+        self.col = col if col >= 0 else self.DEFAULT_COL
+        self.time = time if time else self.DEFAULT_TIM
 
 
     def __str__(self):
@@ -79,7 +87,7 @@ class Signal(object):
         """
         is a factory function to parse directly from json
 
-        :param txt: is a :py:class:Signal as a valid json string
+        :param txt: NO_TYPEpy:class:Signal as a valid json string
         :return: :py:class:Signal object
         """
         json_ = json.loads(txt)
@@ -118,54 +126,41 @@ class Signal(object):
 
 class SignalAccumulator(object):
     """
-    maintains a group of signals
+    maintains a group of signals of the same attempt
+    The result is useful for a point of a graph with x being the attempt and
+    y being the count, i.e. the number of Signals counted
     """
 
-    DEFAULT_TYPE = "NO_TYPE"
+    DEFAULT_ATTEMPT = -1
+    DEFAULT_COUNT = 0
+    WARN_MSG = "type_ or attempt didn't match for {} signals"
 
-    def __init__(self, *signals, **kwargs):
-        self.type_ = kwargs.pop("type_", self.DEFAULT_TYPE)
-        self.attempt = kwargs.pop("attempt",-1)
-        self.count = kwargs.pop("count",0)
-        self.add_signals(*signals)
-
-
-    def add_signals(self,*signals):
-        for signal in signals:
-            if signal.attempt != self.attempt:
-                raise IgnoredWarning(("Attempt {} isn't mine ({}) -> " \
-                      + "signal ignored").format(signal.attempt, self.attempt))
-                continue
-            elif signal.type_ != self.type_:
-                raise IgnoredWarning(("Type '{}' isn't mine '{}' -> " \
-                        + "signal ignored").format(signal.type_, self.type_)
-            else:
-                self.count +=1
+    def __init__(self, attempt=None, count=None, signals=None):
+        self.attempt = attempt if attempt is not None else self.DEFAULT_ATTEMPT
+        self.count = count if count is not None else self.DEFAULT_COUNT
+        self.add_signals(signals)
 
 
-    @classmethod
-    def make_many(cls,*signals):
+    def accept_signal(self,signal):
+        return hasattr(signal,'attempt') and self.attempt == signal.attempt
+
+    def add_signals(self,signals):
         """
-        can be used, when you have a long list of signals of different attempts
-        and you want to automatically create a list 
-        of :py:class:SignalAccumulator objects for each attempt.
+        adds up signals to the current count. It won't remember the signals
+        afterwards. All signals that don#t have an attempt or not the correct
+        one are ignored silently.
 
-        FIXME: maybe this is all not nessesary anymore, because
-        :py:class:framework.Graph has now the responsibility to create
-        different :py:class:framework.SignalAccumulator objects?
-
-        :param signal_iterator: should deliver :py:class:signal.Signal objects
-        :return: a generator for all :py:class:SignalAccumulator objects
+        TOOD: add logger functionality to allow Messaging of ignored signals
         """
-        accumulators = {}
-        for signal in signals:
-            if signal.attempt not in accumulators:
-                accumulators[signal.attempt] = cls(attempt=signal.attempt)
-            accumulators[signal.attempt].add_signals(signal)
-        #the dict was just a helper, users should just get an iterable
-        keys = accumulators.keys()
-        keys.sort()
-        return (accumulators[k] for k in keys)
+        if signals is None:
+            signals = ()
+        elif isinstance(signals,Signal):
+            #just for not writing the same functionality twice
+            signals = (signals,)
+        signals = signals if signals is not None else ()
+        filtered_sigs = filter(self.accept_signal,signals) 
+        self.count += len(filtered_sigs)
+
 
     def __str__(self):
         return "SignalAccumulator('{}',{},{})".format(
@@ -186,25 +181,28 @@ class Graph(object):
     the old graph!
     """
 
+    DEFAULT_TYPE = Signal.DEFAULT_TYP
     DEFAULT_NAME="NO_NAME"
     DEFAULT_XLABEL="x-axis"
     DEFAULT_YLABEL="y-axis"
-    DEFAULT_FORMATTING="r--"
+    DEFAULT_FORMAT="r--"
 
-    def __init__(self, *signal_accumulators, **kwargs):
+    def __init__(self, type_=None, name=None, xlabel=None, ylabel=None,
+            format_=None, signals=None):
         """
-        :param signal_accumulators: an iterator for signal_accumulators
+        :param type_: what Signal.type_ is stored in this graph
         :param name: how the graph will be called in the diagram
+        :param xlabel: naming of the corresponding x-axis in the diagram
         :param ylabel: naming of the corresponding y-axis in the diagram
-        :param formatting: Matlab style formatting for this graph
+        :param format_: Matlab style formatting for this graph
+        :param signals: :py:class:framework.Signal objects to add to that graph
         """
-        self.__signal_accumulators = signal_accumulators
-        self.name = kwargs.pop("name",self.DEFAULT_NAME)
-        self.xlabel = kwargs.pop("xlabel",self.DEFAULT_XLABEL)
-        self.ylabel = kwargs.pop("ylabel",self.DEFAULT_YLABEL)
-        self.formatting = kwargs.pop("formatting",self.DEFAULT_FORMATTING)
-        self.__xdata = np.array([])
-        self.__ydata = np.array([])
+        self.type_ = type_ if type_ is not None else self.DEFAULT_TYPE
+        self.name = name if name is not None else self.DEFAULT_NAME
+        self.xlabel = xlabel if xlabel is not None else self.DEFAULT_XLABEL
+        self.ylabel = ylabel if ylabel is not None else self.DEFAULT_YLABEL
+        self.format_ = format_ if format_ is not None else self.DEFAULT_FORMAT
+        self.__accumulators = {}
         self.__applied = False
 
 
@@ -214,7 +212,7 @@ class Graph(object):
         """
         self.__xdata = np.array([])
         self.__ydata = np.array([])
-        for acc in self.signal_accumulators:
+        for acc in self.__accumulators.values():
             self.__xdata = self.__array_append(self.__xdata,acc.attempt)
             self.__ydata = self.__array_append(self.__ydata,acc.count)
         self.__applied = True
@@ -222,7 +220,10 @@ class Graph(object):
 
     def __array_append(self, in_a,in_b):
         """
-        append a numpy array to another
+        appends a numpy array to another.
+        
+        That's basically a helper function to improve the code quality of the
+        rest of the class.
         :param in_a: a numpy array
         :param in_b: a numpy array or a number
         """
@@ -231,29 +232,31 @@ class Graph(object):
         return np.concatenate((in_a,in_b))
 
 
-    @property
-    def signal_accumulators(self):
+    def check_signal(self,signal):
+        return hasattr(signal,"type_") and signal.type_ == self.type_\
+                and hasattr(signal,"attempt")
+
+
+    def add_signals(self,signals):
         """
-        a list of :py:class:signal_accumulator.SignalAccumulator
+        includes signals in this graph. Signals with the wrong type will be
+        ignored and signals with different attempts might lead to adding new
+        SignalAccumulators internally.
 
-        please don't update this array, always reset it! Otherwise the follow
-        up data will not be updated!
+        :param signals: the signals that should be added to this graph
         """
-        return self.__signal_accumulators
-
-
-    @signal_accumulators.setter
-    def signal_accumulators(self,*values):
-        self.__signal_accumulators = values
-        self.__applied = False
-
-
-    @signal_accumulators.deleter
-    def signal_accumulators(self):
-        self.__signal_accumulators = None
-        self.__xdata = None
-        self.__ydata = None
-        self.__applied = True
+        if signals is None:
+            signals = ()
+        elif isinstance(signals,Signal):
+            signals = (signals,)
+        for signal in signals:
+            if not self.check_signal(signal):
+                continue
+            if signal.attempt not in self.__accumulators:
+                self.__accumulators[signal.attempt] = SignalAccumulator(
+                    attempt=signal.attempt
+                )
+            self.__accumulators[signal.attempt].add_signals(signal)
 
 
     @property
@@ -281,7 +284,7 @@ class Graph(object):
                 self.name,
                 self.xlabel,
                 self.ylabel,
-                self.formatting,
+                self.format_,
                 self.x_data,
                 self.y_data
         )
@@ -311,14 +314,6 @@ class Diagram(object):
         self.title = title if title else self.DEFAULT_TITLE
         self.all_graphs = all_graphs if all_graphs else self.DEFAULT_GRAPH_LIST
 
-    def add_signals(signals):
-        """
-        TODO: Create a new graph for every new signal type you spot, add a new
-              SignalAccumulator to every Graph for every attempt you spot
-              and then add the signals to the SignalAccumulators (which maybe
-              should be done indirectly through the Graph objects)
-        """
-
 
     def draw(self):
         """
@@ -329,13 +324,8 @@ class Diagram(object):
         for element in all_graphs:
             if isinstance(element,tuple):
                 if len(element) != 2:
-                    raise IgnoredWarning("expected a tuple of size 2.\n"\
-                            + "More graphs in one diagram isn't meaningful. "\
-                            + "Ignored '{}'".format(element))
                     continue
                 if not all((isinstance(e,Graph) for e in element)):
-                    raise IgnoredWarning("both elements should be element of "\
-                            + "Graph. Ignored '{}'".format(element))
                     continue
                 both = element # improving readability
                 plot1 = plt.figure().add_subplot(111)
@@ -350,14 +340,17 @@ class Diagram(object):
                 plot = plt.figure().add_subplot(111)
                 plots.append(plot)
                 self.__init_plot(plot)
+        self.__write_to_file()
 
-            else:
-                raise IgnoredWarning("expect ellements to be tuple or Graph,"\
-                        + "but found '{}'".format(element))
-                continue
+
+    def __write_to_file(self):
+        """
+        encapsulates file I/O for improved testability. 
+        """
         plt.title(self.title)
         plt.savefig(self.filename)
         return self
+
 
     def __init_plot(self,plot,graph):
         """
@@ -373,6 +366,7 @@ class Diagram(object):
         plot.axis([0,graph.xdata.max()*1.1,
                     0,graph.ydata.max()*1.1])
         return plot
+
 
     def __str__(self):
         return "Diagram('{}','{}',{})".format(

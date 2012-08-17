@@ -52,7 +52,7 @@ class TestGraph(unittest.TestCase):
                 name=exp_name,
                 xlabel=exp_xlabel,
                 ylabel=exp_ylabel,
-                formatting=exp_formatting
+                format_=exp_formatting
         )
         #assert
         self.assertEqual(expected,str(sut),
@@ -69,16 +69,16 @@ class TestGraph(unittest.TestCase):
         """
         #prepare
         expected_data = [3,4,5,6,5]
-        input_accs = [fw.SignalAccumulator(attempt=atm,count=count) 
-                for  atm,count in enumerate(expected_data)]
-        #print map(str,input_accs)
+        signals = [fw.Signal(attempt=attempt) 
+                    for attempt, i in enumerate(expected_data)
+                    for x in range(i)]
+        sut = fw.Graph()
         #exec
-        sut = fw.Graph(*input_accs)
+        sut.add_signals(signals)
+        #assert
         result = [0 for x in expected_data]
         for i,x in enumerate(sut.x_data):
             result[int(x)] = int(sut.y_data[i])
-        #print result
-        #assert
         self.assertEqual(expected_data,result,
                 self.ASSERT_TXT.format(expected_data, result))
 

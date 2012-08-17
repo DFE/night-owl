@@ -36,7 +36,7 @@ class TestSignalAccumulator(unittest.TestCase):
         attempt=1
         input_ = fw.Signal(1,attempt=attempt)
         #exec
-        sut = fw.SignalAccumulator(input_,attempt=attempt)
+        sut = fw.SignalAccumulator(attempt=attempt,signals=input_)
         #assert
         self.assertEqual(expected_count,sut.count,
                 self.ASSERT_TXT.format(expected_count,sut.count))
@@ -48,7 +48,7 @@ class TestSignalAccumulator(unittest.TestCase):
         attempt=1
         input_ = [fw.Signal(i,attempt=attempt) for i in range(expected_count)]
         #exec
-        sut = fw.SignalAccumulator(*input_,attempt=attempt)
+        sut = fw.SignalAccumulator(attempt=attempt,signals=input_)
         #assert
         self.assertEqual(expected_count,sut.count,
                 self.ASSERT_TXT.format(expected_count,sut.count))
@@ -59,26 +59,12 @@ class TestSignalAccumulator(unittest.TestCase):
         expected_count = 0
         attempt=1
         dont_match=12
-        input_ = fw.Signal(1,attempt=attempt)
-        #exec+assert
-        with self.assertRaises(fw.IgnoredWarning):
-            sut = fw.SignalAccumulator(input_,attempt=dont_match)
-
-
-    def test_make_many(self):
-        #prepare
-        exp_counts = [3,4,5]
-        input_ = [fw.Signal(tid,attempt=atm)
-                        for atm,count in enumerate(exp_counts)
-                        for tid in range(count)]
+        input_ = fw.Signal(attempt=attempt)
         #exec
-        result = fw.SignalAccumulator.make_many(*input_)
+        sut = fw.SignalAccumulator(attempt=dont_match,signals=input_)
         #assert
-        for sut in result:
-            self.assertEqual(exp_counts[sut.attempt],sut.count,
-                self.ASSERT_TXT.format(exp_counts[sut.attempt],sut.count) \
-                + "for {}".format(sut))
-
+        self.assertEqual(expected_count,sut.count,
+                ASSERT_TXT.format(expected_count,sut.count))
 
 
 if __name__ == '__main__':

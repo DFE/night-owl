@@ -27,6 +27,7 @@ import framework as fw
 class TestDiagram(unittest.TestCase):
     """
     does the testing for :py:class:framework.Diagram
+    TODO add more tests and remove framework depency from Diagram.draw()
     """
 
     ASSERT_TXT = "expected '{}' \nbut got '{}'"
