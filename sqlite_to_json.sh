@@ -2,7 +2,7 @@
 
 #FIXME: This is all too much hackety hack. Rewrite!
 json1="{"
-json1="$json1 \"tid\":\1,"
+json1="$json1 \"signal_tid\":\1,"
 json1="$json1 \"type\":\"\2\","
 json1="$json1 \"attempt\":\3,"
 json1="$json1 \"msg\":\"\4\","
@@ -26,7 +26,6 @@ if [ -z $1 ]; then
     exit 1
 fi
 
-sqlite3 $1 "$sql" \
+sqlite3 $1 "$sql" | sed "s/\"/'/g" \
     | sed "s/$e|$e|$e|$e|$e|$e|$e|$e\(.*\)/$json1\9/" \
     | sed "s/$e|$e|$e|$e/$json2/" \
-#    | sed "s/'/\\\"/g"

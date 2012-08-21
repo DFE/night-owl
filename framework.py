@@ -18,6 +18,9 @@ manages helper and ORM classes.
 
 import json
 import numpy as np
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
 
 
 class BadParamException(Exception):
@@ -182,12 +185,13 @@ class Graph(object):
     """
 
     DEFAULT_TYPE = Signal.DEFAULT_TYP
-    DEFAULT_NAME="NO_NAME"
+    TYPE_WARNING = Signal.TYPE_WARNING
+    TYPE_ERROR = Signal.TYPE_ERROR
     DEFAULT_XLABEL="x-axis"
     DEFAULT_YLABEL="y-axis"
     DEFAULT_FORMAT="r--"
 
-    def __init__(self, type_=None, name=None, xlabel=None, ylabel=None,
+    def __init__(self, type_=None, xlabel=None, ylabel=None,
             format_=None, signals=None):
         """
         :param type_: what Signal.type_ is stored in this graph
@@ -198,7 +202,6 @@ class Graph(object):
         :param signals: :py:class:framework.Signal objects to add to that graph
         """
         self.type_ = type_ if type_ is not None else self.DEFAULT_TYPE
-        self.name = name if name is not None else self.DEFAULT_NAME
         self.xlabel = xlabel if xlabel is not None else self.DEFAULT_XLABEL
         self.ylabel = ylabel if ylabel is not None else self.DEFAULT_YLABEL
         self.format_ = format_ if format_ is not None else self.DEFAULT_FORMAT
@@ -260,7 +263,7 @@ class Graph(object):
 
 
     @property
-    def x_data(self):
+    def xdata(self):
         """
         generates data for the x values of a pylab graph plot
         """
@@ -270,7 +273,7 @@ class Graph(object):
 
 
     @property
-    def y_data(self):
+    def ydata(self):
         """
         generates data for the y values of a pylab graph plot
         """
@@ -281,12 +284,12 @@ class Graph(object):
 
     def __str__(self):
         return "Graph('{}','{}','{}','{}',{},{})".format(
-                self.name,
+                self.type_,
                 self.xlabel,
                 self.ylabel,
                 self.format_,
-                self.x_data,
-                self.y_data
+                self.xdata,
+                self.ydata
         )
 
 
@@ -312,7 +315,8 @@ class Diagram(object):
         """
         self.filename = filename if filename else self.DEFAULT_FILENAME
         self.title = title if title else self.DEFAULT_TITLE
-        self.all_graphs = all_graphs if all_graphs else self.DEFAULT_GRAPH_LIST
+        self.all_graphs = all_graphs if all_graphs \
+                                        else self.DEFAULT_GRAPH_LIST
 
 
     def draw(self):
@@ -321,7 +325,7 @@ class Diagram(object):
         Object attributes, so there is neither input nor output needed.
         """
         plots = []
-        for element in all_graphs:
+        for element in self.all_graphs:
             if isinstance(element,tuple):
                 if len(element) != 2:
                     continue
@@ -330,16 +334,22 @@ class Diagram(object):
                 both = element # improving readability
                 plot1 = plt.figure().add_subplot(111)
                 plots.append(plot1)
-                self.__init_plot(plot1)
+                #FIXME inserted __init_plot for testing
+                plot = plot1
+                graph = both[0]
+                plot.set_xlabel(graph.xlabel)
+                plot.set_ylabel(graph.ylabel)
+                plot.plot(graph.xdata, graph.ydata,graph.format_)
+                self.__init_plot(plot1,both[0])
                 plot2 = plot1.twinx()
-                plots.add(plot2)
-                self.__init_plot(plot2)
+                plots.append(plot2)
+                self.__init_plot(plot2,both[1])
 
             elif isinstance(element, Graph):
                 single = element #improve readability
                 plot = plt.figure().add_subplot(111)
                 plots.append(plot)
-                self.__init_plot(plot)
+                self.__init_plot(plot,element)
         self.__write_to_file()
 
 
@@ -361,10 +371,13 @@ class Diagram(object):
 
         plot.set_xlabel(graph.xlabel)
         plot.set_ylabel(graph.ylabel)
-        plot.plot(graph.xdata, graph.ydata,graph.formatting,
-                label=graph.name)
-        plot.axis([0,graph.xdata.max()*1.1,
-                    0,graph.ydata.max()*1.1])
+        plot.plot(graph.xdata, graph.ydata,graph.format_)
+        #FIXME This is a late night hack, get rid of it!
+        if (len(graph.xdata) > 0) and (len(graph.ydata) > 0):
+            #this code raises a ValueError for calling max()
+            #on an empty array
+            plot.axis([0,graph.xdata.max()*1.1,
+                        0,graph.ydata.max()*1.1])
         return plot
 
 
