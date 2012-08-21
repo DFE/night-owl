@@ -75,13 +75,10 @@ BUILD_NUM=$(date +%s)
 
 # Generate cumulated error log
 ./log_to_db.sh $BUILD_LOG $DB_NAME #new
-cat $BUILD_LOG | $THIS/filter_errorlog.py $JOB $BUILD_NUM >>$ERROR_LOG #old
 
 # now paint a graph from all builds recorded so far
-cat $ERROR_LOG | \
-    $THIS/to_json.py | \
-    grep -P "(WARN_COUNT)|(ERR_COUNT)" | \
-    $THIS/to_graph.py \
+./sqlite_to_json.sh $DB_NAME | \
+    ./night_owl_cli.py \
         "$GRAPH_FILE" \
         "$GRAPH_NAME" \
         "$LABEL_X" \
