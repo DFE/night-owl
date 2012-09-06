@@ -74,11 +74,11 @@ BUILD_NUM=$(date +%s)
 
 
 # Generate cumulated error log
-./log_to_db.sh $BUILD_LOG $DB_NAME #new
+$THIS/log_to_db.sh $BUILD_LOG $DB_NAME #new
 
 # now paint a graph from all builds recorded so far
-./sqlite_to_json.sh $DB_NAME | \
-    ./night_owl_cli.py \
+$THIS/sqlite_to_json.sh $DB_NAME | \
+    $THIS/night_owl_cli.py \
         "$GRAPH_FILE" \
         "$GRAPH_NAME" \
         "$LABEL_X" \
