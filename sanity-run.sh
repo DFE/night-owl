@@ -24,7 +24,9 @@ RES_DIR="$THIS/../build/night-owl"
 mkdir -p $RES_DIR
 
 #where to find the build logs
-BUILD_LOG=$(ls -1 $THIS/../build/tmp-eglibc/cooker.log.* | sort -n | tail -1)
+#alt:BUILD_LOG=$(ls -1 $THIS/../build/tmp-eglibc/cooker.log.* | sort -n | tail -1)
+BUILD_LOG=$(ls -1 $THIS/../build/tmp-eglibc/log/cooker/hidav-ti81xx/*.log | sort -n | tail -1)
+
 
 #where the data is stored
 DB_NAME="$THIS/../build/night-owl/logging.db"
