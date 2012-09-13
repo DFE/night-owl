@@ -64,7 +64,7 @@ class TestSignalAccumulator(unittest.TestCase):
         sut = fw.SignalAccumulator(attempt=dont_match,signals=input_)
         #assert
         self.assertEqual(expected_count,sut.count,
-                ASSERT_TXT.format(expected_count,sut.count))
+                self.ASSERT_TXT.format(expected_count,sut.count))
 
 
 if __name__ == '__main__':

@@ -49,7 +49,7 @@ class TestGraph(unittest.TestCase):
         )
         #execute
         sut = fw.Graph(
-                name=exp_name,
+                type_=exp_name,
                 xlabel=exp_xlabel,
                 ylabel=exp_ylabel,
                 format_=exp_formatting
@@ -77,8 +77,8 @@ class TestGraph(unittest.TestCase):
         sut.add_signals(signals)
         #assert
         result = [0 for x in expected_data]
-        for i,x in enumerate(sut.x_data):
-            result[int(x)] = int(sut.y_data[i])
+        for i,x in enumerate(sut.xdata):
+            result[int(x)] = int(sut.ydata[i])
         self.assertEqual(expected_data,result,
                 self.ASSERT_TXT.format(expected_data, result))
 

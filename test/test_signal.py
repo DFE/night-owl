@@ -62,7 +62,8 @@ class TestSignal(unittest.TestCase):
                 data["time"]
         ))
         #execute
-        result = str(framework.Signal.make_from_json(input_))
+        first = [i for i in framework.Signal.make_from_json(input_)][0]
+        result = str(first)
         #assert
         self.assertEqual(expected,result,
                 self.ASSERT_TXT.format(expected,result))

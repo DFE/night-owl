@@ -122,7 +122,9 @@ class Signal(object):
         :return: a generator that creates Signal objects
         """
         import collections as c
-        data = input_ if isinstance(input_,c.Iterable) else (input_,)
+        #str is an Iterable but should be treated as anything else
+        if (not isinstance(input_,c.Iterable)) or isinstance(input_,str):
+            data = (input_,)
         return (cls.__make_single_from_json(txt) for txt in data)
 
 

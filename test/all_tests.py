@@ -13,16 +13,18 @@
 #
 
 import unittest
-from test_filter_errorlog import TestFilterErrorlog
+from test_signal import TestSignal
+from test_signal_accumulator import TestSignalAccumulator
 from test_graph import TestGraph
-from test_to_json import TestToJson
+from test_diagram import TestDiagram
 
 class AllTests(unittest.TestSuite):
 
     def __init__(self):
-        self.addTest(TestFilterErrorlog().suite())
-        self.addTest(TestGraph().suite())
-        self.addTest(TestToJson().suite())
+        self.addTest(Signal().suite())
+        self.addTest(SignalAccumulator().suite())
+        self.addTest(Graph().suite())
+        self.addTest(Diagram().suite())
 
 
 if __name__ == "__main__":
