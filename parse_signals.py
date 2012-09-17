@@ -46,7 +46,9 @@ def parse_line(line, regex,reg_to_type,state=copy.deepcopy(STATE_PARSER_START)):
         return make_signal(
                 sig_type=reg_to_type[regex],
                 attempt=DEFAULT_SIG_ATTEMPT,
-                msg=re.sub(r'"',"'",regex.findall(line)[0]),
+                #FIXME here's a workaround that replaces | for #pipe#
+                #      because in the db output, we seperate attributes by |
+                msg=re.sub(r'|',"#pipe#",re.sub(r'"',"'",regex.findall(line)[0])),
                 cat=DEFAULT_SIG_CATEGORY,
                 recipe=state['recipe'],
                 cmd=state['cmd'],
